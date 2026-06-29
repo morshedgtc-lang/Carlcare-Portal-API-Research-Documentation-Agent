@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  name          String?
+  role          String    @default("USER")
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  serviceRequests ServiceRequest[]
+  notifications   Notification[]
+}
+
+model Device {
+  id        Int     @id @default(autoincrement())
+  imei      String  @unique
+  brand     String?
+  model     String?
+  country   String?
+
+  serviceRequests ServiceRequest[]
+}
+
+model ServiceRequest {
+  id              Int      @id @default(autoincrement())
+  serviceNumber   String   @unique
+  imei            String
+  brand           String?
+  model           String?
+  country         String?
+  status          String   @default("PENDING")
+  applicationTime DateTime?
+  reviewTime      DateTime?
+  note            String?
+  adminNote       String?
+  source          String   @default("MANUAL")
+  submittedBy     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  submittedByUser User?    @relation(fields: [submittedBy], references: [id])
+  device          Device?  @relation(fields: [imei], references: [imei])
+
+  @@index([imei])
+  @@index([status])
+}
+
+model LookupLog {
+  id          Int      @id @default(autoincrement())
+  imei        String
+  source      String
+  found       Boolean
+  responseRaw String?
+  ip          String?
+  userId      Int?
+  duration    Int?
+  createdAt   DateTime @default(now())
+
+  @@index([imei])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  type      String   @default("info")
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+}

@@ -1,0 +1,12 @@
+Database connected
+IMEI Lookup API running on port 3000 [development]
+Health check: http://localhost:3000/api/health
+Redis unavailable - caching disabled: 
+::1 - GET /api/health HTTP/1.1 200 94 - 3.809 ms
+::1 - POST /api/auth/login HTTP/1.1 200 557 - 279.612 ms
+::1 - GET /api/auth/profile HTTP/1.1 304 - - 2.580 ms
+::1 - GET /api/auth/profile HTTP/1.1 304 - - 1.385 ms
+::1 - GET /api/admin/requests?page=1&limit=20 HTTP/1.1 200 493 - 5.179 ms
+::1 - GET /api/admin/charts?days=14 HTTP/1.1 304 - - 2.788 ms
+::1 - GET /api/admin/dashboard HTTP/1.1 200 595 - 9.864 ms
+::1 - POST /api/auth/login HTTP/1.1 200 557 - 260.776 ms
