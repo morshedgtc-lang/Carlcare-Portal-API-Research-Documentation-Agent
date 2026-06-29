@@ -5,6 +5,7 @@ import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 import { config } from './config';
 import { connectDatabase } from './services/prisma';
 import routes from './routes';
@@ -12,10 +13,10 @@ import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: config.nodeEnv === 'production'
-    ? ['https://your-frontend-domain.com']
+    ? [config.railwayUrl].filter(Boolean)
     : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
 }));
@@ -35,6 +36,12 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use('/api', routes);
+
+const frontendDir = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(frontendDir));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendDir, 'index.html'));
+});
 
 app.use(errorHandler);
 
